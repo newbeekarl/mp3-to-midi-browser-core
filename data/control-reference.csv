@@ -1,0 +1,7 @@
+control,minimum,maximum,default,step,unit,purpose
+silence_threshold,-70,-20,-45,1,dB,Ignore frames quieter than the selected level
+pitch_low,40,400,65,5,Hz,Set the lowest pitch considered during detection
+pitch_high,300,2000,1200,25,Hz,Set the highest pitch considered during detection
+minimum_note,40,500,90,10,ms,Discard detected fragments shorter than this duration
+tempo,60,200,120,1,BPM,Write MIDI timing against the selected tempo
+quantize,0,32,16,n/a,note_grid,Snap note timing to a grid or use zero for off

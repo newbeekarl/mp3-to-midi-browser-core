@@ -1,0 +1,11 @@
+{
+  "name": "mp3-to-midi-browser-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Dependency-free monophonic audio-to-MIDI reference implementation for the browser.",
+  "scripts": {
+    "test": "node --test"
+  },
+  "license": "MIT"
+}

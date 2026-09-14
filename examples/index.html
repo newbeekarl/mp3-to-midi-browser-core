@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MP3 to MIDI Browser Core — Minimal Demo</title>
+    <style>
+      body { max-width: 46rem; margin: 3rem auto; padding: 0 1rem; font: 16px/1.55 system-ui, sans-serif; }
+      label, button { display: block; margin: 1rem 0; }
+      button { padding: .7rem 1rem; }
+      output { white-space: pre-wrap; }
+    </style>
+  </head>
+  <body>
+    <h1>MP3 to MIDI Browser Core</h1>
+    <p>Select a clear, single-note MP3 or WAV. Processing stays in this browser.</p>
+    <label>Audio file <input id="audio" type="file" accept=".mp3,.wav,audio/mpeg,audio/wav"></label>
+    <button id="convert" disabled>Convert and download MIDI</button>
+    <output id="status">Choose a file.</output>
+    <script type="module">
+      import { analyzeAudioBuffer, createMidiFile } from '../src/audio-to-midi.js';
+
+      const input = document.querySelector('#audio');
+      const button = document.querySelector('#convert');
+      const status = document.querySelector('#status');
+      let decoded = null;
+
+      input.addEventListener('change', async () => {
+        const file = input.files[0];
+        if (!file) return;
+        status.textContent = 'Decoding locally…';
+        const context = new AudioContext();
+        try {
+          decoded = await context.decodeAudioData(await file.arrayBuffer());
+          button.disabled = false;
+          status.textContent = `Ready: ${file.name}`;
+        } catch {
+          decoded = null;
+          button.disabled = true;
+          status.textContent = 'This browser could not decode that file.';
+        } finally {
+          await context.close();
+        }
+      });
+
+      button.addEventListener('click', () => {
+        const notes = analyzeAudioBuffer(decoded);
+        const bytes = createMidiFile(notes);
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(new Blob([bytes], { type: 'audio/midi' }));
+        link.download = `${input.files[0].name.replace(/\.[^.]+$/, '')}.mid`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+        status.textContent = `Created ${notes.length} MIDI note${notes.length === 1 ? '' : 's'}.`;
+      });
+    </script>
+  </body>
+</html>
